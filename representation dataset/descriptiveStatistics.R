@@ -5,15 +5,13 @@ teacher2020 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representati
 intern2020 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2020 Intern Projects.csv")
 intern2021 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2021 Intern Projects.csv")
 
-df <- data.frame(Variables = c("hasAvatar", "noAvatar", "playAvatar", "npcAvatar", "guideAvatar", "humanAvatar", "femaleAvatar", "maleAvatar", "whiteAvatar", "pocAvatar", "historicAvatar", "youngAvatar", "multipleAvatars", "preloadedAvatar", "importedAvatar"))
+df <- data.frame(Variables = c("hasAvatar", "noAvatar", "playAvatar", "npcAvatar", "guideAvatar", "humanAvatar", "femaleAvatar", "maleAvatar", "nbAvatar", "whiteAvatar", "pocAvatar", "historicAvatar", "youngAvatar", "multipleAvatars", "preloadedAvatar", "importedAvatar"))
 
 finalDS <- "C:/Users/nalin/Downloads/NC State/Datasets/FinalDS.xlsx"
 ##############functions##########################
 checkCondition <- function(row, column, value, storeList, data){
   if (data[row, column] == value) {
-    if (!data[row, 1] %in% storeList){
-      return (data[row, 1])
-    }
+    return (data[row, 1])
   }
 }
 
@@ -74,7 +72,6 @@ cleanData <- function(data, x){
 mainFunction <- function(dataset, name){
   dataset <- cleanData(dataset, name)
 
-  allLessons <- list()
   hasAvatar <- list()
   noAvatar <- list()
   playAvatar <- list()
@@ -83,6 +80,7 @@ mainFunction <- function(dataset, name){
   humanAvatar <- list()
   femaleAvatar <- list()
   maleAvatar <- list()
+  nbAvatar <- list()
   whiteAvatar <- list()
   pocAvatar <- list()
   historicAvatar <- list()
@@ -91,10 +89,9 @@ mainFunction <- function(dataset, name){
   preloadedAvatar <- list()
   importedAvatar <- list()
   
-  for (i in 1:nrow(dataset)) {
-    if (!dataset[i, 1] %in% allLessons){
-      allLessons <- append(allLessons, dataset[i,1])
-    }
+  n <- nrow(dataset)
+  
+  for (i in 1:n) {
     
     hasAvatar <- append(hasAvatar, checkCondition(i, 10, "Y", hasAvatar, dataset))
     noAvatar <- append(noAvatar, checkCondition(i, 10, "N", noAvatar, dataset))
@@ -103,7 +100,8 @@ mainFunction <- function(dataset, name){
     guideAvatar <- append(guideAvatar, checkCondition(i, 11, "G", guideAvatar, dataset))
     humanAvatar <- append(humanAvatar, checkCondition(i, 12, "Y", humanAvatar, dataset))
     femaleAvatar <- append(femaleAvatar, checkCondition(i, 13, "F", femaleAvatar, dataset))
-    maleAvatar<- append(maleAvatar, checkCondition(i, 13, "M", maleAvatar, dataset))
+    maleAvatar <- append(maleAvatar, checkCondition(i, 13, "M", maleAvatar, dataset))
+    nbAvatar <- append(nbAvatar, checkCondition(i, 13, "NB", nbAvatar, dataset))
     whiteAvatar <- append(whiteAvatar, checkCondition(i, 14, "W", whiteAvatar, dataset))
     pocAvatar<- append(pocAvatar, checkCondition(i, 14, "POC", pocAvatar, dataset))
     historicAvatar <- append(historicAvatar, checkCondition(i, 15, "Y", historicAvatar, dataset))
@@ -113,30 +111,32 @@ mainFunction <- function(dataset, name){
     importedAvatar <- append(importedAvatar, checkCondition(i, 18, "I", importedAvatar, dataset))
   }
   
-  n <- length(allLessons)
+  numAvatars <- length(hasAvatar)
+  numHumans <- length(humanAvatar)
   
   DShasAvatar <- getDS(hasAvatar, n)
   DSnoAvatar <- getDS(noAvatar, n)
-  DSplayAvatar <- getDS(playAvatar, n)
-  DSnpcAvatar <- getDS(npcAvatar, n)
-  DSguideAvatar <- getDS(guideAvatar, n)
-  DShumanAvatar <- getDS(humanAvatar, n)
-  DSfemaleAvatar <- getDS(femaleAvatar, n)
-  DSmaleAvatar <- getDS(maleAvatar, n)
-  DSwhiteAvatar <- getDS(whiteAvatar, n)
-  DSpocAvatar <- getDS(pocAvatar, n)
-  DShistoricAvatar <- getDS(historicAvatar, n)
-  DSyoungAvatar <- getDS(youngAvatar, n)
+  DSplayAvatar <- getDS(playAvatar, numAvatars)
+  DSnpcAvatar <- getDS(npcAvatar, numAvatars)
+  DSguideAvatar <- getDS(guideAvatar, numAvatars)
+  DShumanAvatar <- getDS(humanAvatar, numAvatars)
+  DSfemaleAvatar <- getDS(femaleAvatar, numHumans)
+  DSmaleAvatar <- getDS(maleAvatar, numHumans)
+  DSnbAvatar <- getDS(nbAvatar, numHumans)
+  DSwhiteAvatar <- getDS(whiteAvatar, numHumans)
+  DSpocAvatar <- getDS(pocAvatar, numHumans)
+  DShistoricAvatar <- getDS(historicAvatar, numHumans)
+  DSyoungAvatar <- getDS(youngAvatar, numHumans)
   DSmultipleAvatars <- getDS(multipleAvatars, n)
-  DSpreloadedAvatar <- getDS(preloadedAvatar, n)
-  DSimportedAvatar <- getDS(importedAvatar, n)
+  DSpreloadedAvatar <- getDS(preloadedAvatar, numAvatars)
+  DSimportedAvatar <- getDS(importedAvatar, numAvatars)
   
-  df[name] <- c(DShasAvatar, DSnoAvatar, DSplayAvatar, DSnpcAvatar, DSguideAvatar, DShumanAvatar, DSfemaleAvatar, DSmaleAvatar, DSwhiteAvatar, DSpocAvatar, DShistoricAvatar, DSyoungAvatar, DSmultipleAvatars, DSpreloadedAvatar, DSimportedAvatar)
+  df[name] <- c(DShasAvatar, DSnoAvatar, DSplayAvatar, DSnpcAvatar, DSguideAvatar, DShumanAvatar, DSfemaleAvatar, DSmaleAvatar, DSnbAvatar, DSwhiteAvatar, DSpocAvatar, DShistoricAvatar, DSyoungAvatar, DSmultipleAvatars, DSpreloadedAvatar, DSimportedAvatar)
   
   return(df)
 }
 
-#########a##########main functions#############
+###############main functions#############
 df <- mainFunction(teacher2019, "teacher2019")
 df <- mainFunction(teacher2020, "teacher2020")
 df <- mainFunction(intern2020, "intern2020")
