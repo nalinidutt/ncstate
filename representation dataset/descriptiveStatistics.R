@@ -1,0 +1,145 @@
+library("writexl")
+
+teacher2019 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2019 Teacher Projects.csv")
+teacher2020 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2020 Teacher Projects.csv")
+intern2020 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2020 Intern Projects.csv")
+intern2021 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2021 Intern Projects.csv")
+
+df <- data.frame(Variables = c("hasAvatar", "noAvatar", "playAvatar", "npcAvatar", "guideAvatar", "humanAvatar", "femaleAvatar", "maleAvatar", "whiteAvatar", "pocAvatar", "historicAvatar", "youngAvatar", "multipleAvatars", "preloadedAvatar", "importedAvatar"))
+
+finalDS <- "C:/Users/nalin/Downloads/NC State/Datasets/FinalDS.xlsx"
+##############functions##########################
+checkCondition <- function(row, column, value, storeList, data){
+  if (data[row, column] == value) {
+    if (!data[row, 1] %in% storeList){
+      return (data[row, 1])
+    }
+  }
+}
+
+getDS <- function(list, denom){
+  return (length(list)/denom)
+}
+
+cleanData <- function(data, x){
+  colnames(data)[1] <- "project"
+  colnames(data)[2] <- "description"
+  colnames(data)[3] <- "subjects"
+  colnames(data)[4] <- "grades"
+  colnames(data)[5] <- "standards"
+  colnames(data)[10] <- "avatar"
+  colnames(data)[11] <- "type_of_avatar"
+  colnames(data)[12] <- "human_avatar"
+  colnames(data)[13] <- "avatar_gender"
+  colnames(data)[14] <- "avatar_race"
+  colnames(data)[15] <- "historic_lit_avatar"
+  colnames(data)[16] <- "youth"
+  colnames(data)[17] <- "multiple"
+  colnames(data)[18] <- "preloaded_imported"
+  
+  for (i in 10:18) {
+    for (j in 1:nrow(data)) {
+      data[j, i] <- toupper(data[j, i])
+    }
+  }
+  
+  ######################cleaning specific data#####################
+  if (x == "teacher2019"){
+    for (i in 2:12) {
+      data[i, 1] <- "A Midsummer Night's Dream Character Confessional and Scene Selection"
+    }
+    
+    for (i in 2:12) {
+      data[i, 2] <- "How do characters in A Midsummer Night's Dream try to control each other, and what happens when they do?"
+    }
+    
+    data[98, 1] <- "Let's Tessellate!"
+    
+    data <- data[-c(30, 62, 67, 75, 123, 134, 144, 145),]
+  }
+  
+  if (x == "teacher2020"){
+    data <- data[-c(47, 55, 59),]
+  }
+  
+  if (x == "intern2020"){
+    data <- data[-c(91),]
+    
+    data <- data[-c(10)]
+  }
+  
+  return(data)
+}
+
+mainFunction <- function(dataset, name){
+  dataset <- cleanData(dataset, name)
+
+  allLessons <- list()
+  hasAvatar <- list()
+  noAvatar <- list()
+  playAvatar <- list()
+  npcAvatar <- list()
+  guideAvatar <- list()
+  humanAvatar <- list()
+  femaleAvatar <- list()
+  maleAvatar <- list()
+  whiteAvatar <- list()
+  pocAvatar <- list()
+  historicAvatar <- list()
+  youngAvatar <- list()
+  multipleAvatars <- list()
+  preloadedAvatar <- list()
+  importedAvatar <- list()
+  
+  for (i in 1:nrow(dataset)) {
+    if (!dataset[i, 1] %in% allLessons){
+      allLessons <- append(allLessons, dataset[i,1])
+    }
+    
+    hasAvatar <- append(hasAvatar, checkCondition(i, 10, "Y", hasAvatar, dataset))
+    noAvatar <- append(noAvatar, checkCondition(i, 10, "N", noAvatar, dataset))
+    playAvatar <- append(playAvatar, checkCondition(i, 11, "PC", playAvatar, dataset))
+    npcAvatar <- append(npcAvatar, checkCondition(i, 11, "NPC", npcAvatar, dataset))
+    guideAvatar <- append(guideAvatar, checkCondition(i, 11, "G", guideAvatar, dataset))
+    humanAvatar <- append(humanAvatar, checkCondition(i, 12, "Y", humanAvatar, dataset))
+    femaleAvatar <- append(femaleAvatar, checkCondition(i, 13, "F", femaleAvatar, dataset))
+    maleAvatar<- append(maleAvatar, checkCondition(i, 13, "M", maleAvatar, dataset))
+    whiteAvatar <- append(whiteAvatar, checkCondition(i, 14, "W", whiteAvatar, dataset))
+    pocAvatar<- append(pocAvatar, checkCondition(i, 14, "POC", pocAvatar, dataset))
+    historicAvatar <- append(historicAvatar, checkCondition(i, 15, "Y", historicAvatar, dataset))
+    youngAvatar <- append(youngAvatar, checkCondition(i, 16, "Y", youngAvatar, dataset))
+    multipleAvatars <- append(multipleAvatars, checkCondition(i, 17, "Y", multipleAvatars, dataset))
+    preloadedAvatar <- append(preloadedAvatar, checkCondition(i, 18, "P", preloadedAvatar, dataset))
+    importedAvatar <- append(importedAvatar, checkCondition(i, 18, "I", importedAvatar, dataset))
+  }
+  
+  n <- length(allLessons)
+  
+  DShasAvatar <- getDS(hasAvatar, n)
+  DSnoAvatar <- getDS(noAvatar, n)
+  DSplayAvatar <- getDS(playAvatar, n)
+  DSnpcAvatar <- getDS(npcAvatar, n)
+  DSguideAvatar <- getDS(guideAvatar, n)
+  DShumanAvatar <- getDS(humanAvatar, n)
+  DSfemaleAvatar <- getDS(femaleAvatar, n)
+  DSmaleAvatar <- getDS(maleAvatar, n)
+  DSwhiteAvatar <- getDS(whiteAvatar, n)
+  DSpocAvatar <- getDS(pocAvatar, n)
+  DShistoricAvatar <- getDS(historicAvatar, n)
+  DSyoungAvatar <- getDS(youngAvatar, n)
+  DSmultipleAvatars <- getDS(multipleAvatars, n)
+  DSpreloadedAvatar <- getDS(preloadedAvatar, n)
+  DSimportedAvatar <- getDS(importedAvatar, n)
+  
+  df[name] <- c(DShasAvatar, DSnoAvatar, DSplayAvatar, DSnpcAvatar, DSguideAvatar, DShumanAvatar, DSfemaleAvatar, DSmaleAvatar, DSwhiteAvatar, DSpocAvatar, DShistoricAvatar, DSyoungAvatar, DSmultipleAvatars, DSpreloadedAvatar, DSimportedAvatar)
+  
+  return(df)
+}
+
+#########a##########main functions#############
+df <- mainFunction(teacher2019, "teacher2019")
+df <- mainFunction(teacher2020, "teacher2020")
+df <- mainFunction(intern2020, "intern2020")
+df <- mainFunction(intern2021, "intern2021")
+
+write_xlsx(df, finalDS)
