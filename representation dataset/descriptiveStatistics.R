@@ -5,7 +5,7 @@ teacher2020 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representati
 intern2020 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2020 Intern Projects.csv")
 intern2021 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2021 Intern Projects.csv")
 
-df <- data.frame(Variables = c("hasAvatar", "noAvatar", "playAvatar", "npcAvatar", "guideAvatar", "humanAvatar", "femaleAvatar", "maleAvatar", "nbAvatar", "whiteAvatar", "pocAvatar", "historicAvatar", "youngAvatar", "multipleAvatars", "preloadedAvatar", "importedAvatar"))
+df <- data.frame(Variables = c("hasAvatar", "noAvatar", "playAvatar", "npcAvatar", "guideAvatar", "humanAvatar", "femaleAvatar", "maleAvatar", "nbAvatar", "whiteAvatar", "pocAvatar", "historicAvatar", "youngAvatar", "multipleAvatars", "preloadedAvatar", "importedAvatar", "womenOfColor"))
 
 finalDS <- "C:/Users/nalin/Downloads/NC State/Datasets/FinalDS.xlsx"
 ##############functions##########################
@@ -88,6 +88,7 @@ mainFunction <- function(dataset, name){
   multipleAvatars <- list()
   preloadedAvatar <- list()
   importedAvatar <- list()
+  wocAvatar <- list()
   
   n <- nrow(dataset)
   
@@ -109,6 +110,10 @@ mainFunction <- function(dataset, name){
     multipleAvatars <- append(multipleAvatars, checkCondition(i, 17, "Y", multipleAvatars, dataset))
     preloadedAvatar <- append(preloadedAvatar, checkCondition(i, 18, "P", preloadedAvatar, dataset))
     importedAvatar <- append(importedAvatar, checkCondition(i, 18, "I", importedAvatar, dataset))
+    
+    if (dataset[i, 13] == "F" && dataset[i, 14] == "POC"){
+      wocAvatar <- append(dataset, dataset[i,1])
+    }
   }
   
   numAvatars <- length(hasAvatar)
@@ -130,8 +135,9 @@ mainFunction <- function(dataset, name){
   DSmultipleAvatars <- getDS(multipleAvatars, n)
   DSpreloadedAvatar <- getDS(preloadedAvatar, numAvatars)
   DSimportedAvatar <- getDS(importedAvatar, numAvatars)
+  DSwocAvatar <- getDS(wocAvatar, numAvatars)
   
-  df[name] <- c(DShasAvatar, DSnoAvatar, DSplayAvatar, DSnpcAvatar, DSguideAvatar, DShumanAvatar, DSfemaleAvatar, DSmaleAvatar, DSnbAvatar, DSwhiteAvatar, DSpocAvatar, DShistoricAvatar, DSyoungAvatar, DSmultipleAvatars, DSpreloadedAvatar, DSimportedAvatar)
+  df[name] <- c(DShasAvatar, DSnoAvatar, DSplayAvatar, DSnpcAvatar, DSguideAvatar, DShumanAvatar, DSfemaleAvatar, DSmaleAvatar, DSnbAvatar, DSwhiteAvatar, DSpocAvatar, DShistoricAvatar, DSyoungAvatar, DSmultipleAvatars, DSpreloadedAvatar, DSimportedAvatar, DSwocAvatar)
   
   return(df)
 }
