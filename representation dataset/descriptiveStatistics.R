@@ -4,10 +4,11 @@ teacher2019 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representati
 teacher2020 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2020 Teacher Projects.csv")
 intern2020 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2020 Intern Projects.csv")
 intern2021 <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - 2021 Intern Projects.csv")
+all <- read.csv("C:/Users/nalin/Downloads/NC State/Datasets/Representation Tagging - All.csv")
 
 df <- data.frame(Variables = c("hasAvatar", "noAvatar", "playAvatar", "npcAvatar", "guideAvatar", "humanAvatar", "femaleAvatar", "maleAvatar", "nbAvatar", "whiteAvatar", "pocAvatar", "historicAvatar", "youngAvatar", "multipleAvatars", "preloadedAvatar", "importedAvatar", "womenOfColor"))
-
 finalDS <- "C:/Users/nalin/Downloads/NC State/Datasets/FinalDS.xlsx"
+
 ##############functions##########################
 checkCondition <- function(row, column, value, storeList, data){
   if (data[row, column] == value) {
@@ -38,6 +39,7 @@ cleanData <- function(data, x){
   for (i in 10:18) {
     for (j in 1:nrow(data)) {
       data[j, i] <- toupper(data[j, i])
+      data[j, i] <- gsub(" ", "", data[j, i])
     }
   }
   
@@ -72,6 +74,7 @@ cleanData <- function(data, x){
 mainFunction <- function(dataset, name){
   dataset <- cleanData(dataset, name)
 
+  allLessons <- list()
   hasAvatar <- list()
   noAvatar <- list()
   playAvatar <- list()
@@ -90,9 +93,13 @@ mainFunction <- function(dataset, name){
   importedAvatar <- list()
   wocAvatar <- list()
   
-  n <- nrow(dataset)
-  
-  for (i in 1:n) {
+  for (i in 1:nrow(dataset)) {
+    
+    if (!dataset[i,1] %in% allLessons){
+      allLessons <- append(allLessons, dataset[i,1])
+    }
+    
+    numLessons <- length(allLessons)
     
     hasAvatar <- append(hasAvatar, checkCondition(i, 10, "Y", hasAvatar, dataset))
     noAvatar <- append(noAvatar, checkCondition(i, 10, "N", noAvatar, dataset))
@@ -104,7 +111,7 @@ mainFunction <- function(dataset, name){
     maleAvatar <- append(maleAvatar, checkCondition(i, 13, "M", maleAvatar, dataset))
     nbAvatar <- append(nbAvatar, checkCondition(i, 13, "NB", nbAvatar, dataset))
     whiteAvatar <- append(whiteAvatar, checkCondition(i, 14, "W", whiteAvatar, dataset))
-    pocAvatar<- append(pocAvatar, checkCondition(i, 14, "POC", pocAvatar, dataset))
+    pocAvatar <- append(pocAvatar, checkCondition(i, 14, "POC", pocAvatar, dataset))
     historicAvatar <- append(historicAvatar, checkCondition(i, 15, "Y", historicAvatar, dataset))
     youngAvatar <- append(youngAvatar, checkCondition(i, 16, "Y", youngAvatar, dataset))
     multipleAvatars <- append(multipleAvatars, checkCondition(i, 17, "Y", multipleAvatars, dataset))
@@ -119,8 +126,8 @@ mainFunction <- function(dataset, name){
   numAvatars <- length(hasAvatar)
   numHumans <- length(humanAvatar)
   
-  DShasAvatar <- getDS(hasAvatar, n)
-  DSnoAvatar <- getDS(noAvatar, n)
+  DShasAvatar <- getDS(unique(hasAvatar), numLessons)
+  DSnoAvatar <- getDS(unique(noAvatar), numLessons)
   DSplayAvatar <- getDS(playAvatar, numAvatars)
   DSnpcAvatar <- getDS(npcAvatar, numAvatars)
   DSguideAvatar <- getDS(guideAvatar, numAvatars)
@@ -132,7 +139,7 @@ mainFunction <- function(dataset, name){
   DSpocAvatar <- getDS(pocAvatar, numHumans)
   DShistoricAvatar <- getDS(historicAvatar, numHumans)
   DSyoungAvatar <- getDS(youngAvatar, numHumans)
-  DSmultipleAvatars <- getDS(multipleAvatars, n)
+  DSmultipleAvatars <- getDS(unique(multipleAvatars), numLessons)
   DSpreloadedAvatar <- getDS(preloadedAvatar, numAvatars)
   DSimportedAvatar <- getDS(importedAvatar, numAvatars)
   DSwocAvatar <- getDS(wocAvatar, numAvatars)
@@ -147,5 +154,6 @@ df <- mainFunction(teacher2019, "teacher2019")
 df <- mainFunction(teacher2020, "teacher2020")
 df <- mainFunction(intern2020, "intern2020")
 df <- mainFunction(intern2021, "intern2021")
+df <- mainFunction(all, "all")
 
 write_xlsx(df, finalDS)
